@@ -21,7 +21,7 @@ internal class GenerationActivityRepository(TableClient tableClient) : IGenerati
             if (entity is not null)
                 result.Add(entity);
         }
-        return result;
+        return result.OrderBy(r => r.ChatTgId).ThenBy(r => r.GenerationRequestedDateTime);
     }
 
     public async Task<GenerationActivityEntity> GetActivityForDate(DateTimeOffset date, string id)
