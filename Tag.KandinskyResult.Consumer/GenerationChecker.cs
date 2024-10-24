@@ -3,6 +3,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Tag.KandinskyResult.Managers;
 using Telegram.Bot;
+using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types;
 
 namespace Tag.KandinskyResult.Consumer
@@ -33,7 +34,7 @@ namespace Tag.KandinskyResult.Consumer
                     using var photoStream = new MemoryStream(Convert.FromBase64String(imageBase64));
                     await _telegramBotClient.SetChatPhotoAsync(chatId: activity.ChatTgId, InputFileStream.FromStream(photoStream));
                     await _generationActivityManager.CompleteActivity(activity);
-                } 
+                }
                 catch (InvalidOperationException ex) when (ex.Message == "The picture has been censored")
                 {
                     _logger.LogInformation(
@@ -45,6 +46,15 @@ namespace Tag.KandinskyResult.Consumer
                 }
                 catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
                 {
+                    await _generationActivityManager.CompleteActivity(activity);
+                }
+                catch (ApiRequestException ex) when (ex.ErrorCode == 400 && ex.Message == "Bad Request: not enough rights to change chat photo")
+                {
+                    _logger.LogInformation(
+                        ex, "Bot not granted required permissions to set chat (id: {chatId}) photo", activity.ChatTgId);
+                    await _telegramBotClient.SendTextMessageAsync(
+                        chatId: activity.ChatTgId, 
+                        text: $"Нет прав для установки аватарки чата. Дайте мне необходимые права и повторите /generate");
                     await _generationActivityManager.CompleteActivity(activity);
                 }
                 catch (Exception ex){
