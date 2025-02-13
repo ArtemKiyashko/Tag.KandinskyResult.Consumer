@@ -22,7 +22,7 @@ namespace Tag.KandinskyResult.Consumer
         [Function("GenerationChecker")]
         public async Task Run([TimerTrigger("*/30 * * * * *")] TimerInfo myTimer)
         {
-            var activities = await _generationActivityManager.GetActivitiesForToday();
+            var activities = await _generationActivityManager.GetRecentActivities();
             foreach (var activity in activities)
             {
                 try

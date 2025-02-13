@@ -10,4 +10,5 @@ internal interface IGenerationActivityRepository
     Task<IEnumerable<GenerationActivityEntity>> GetActivitiesForDate(DateTimeOffset date);
     Task UpdateActivity(GenerationActivityEntity entity);
     Task<GenerationActivityEntity> GetActivityForDate(DateTimeOffset date, string uuid);
+    Task<IEnumerable<GenerationActivityEntity>> GetActivitiesForDateRange(DateTimeOffset date, TimeSpan range);
 }

@@ -6,4 +6,5 @@ public interface IGenerationActivityManager
 {
     Task<IEnumerable<GenerationActivityDto>> GetActivitiesForToday();
     Task CompleteActivity(GenerationActivityDto activityDto); 
+    Task<IEnumerable<GenerationActivityDto>> GetRecentActivities();
 }

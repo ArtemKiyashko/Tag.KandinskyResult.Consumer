@@ -19,6 +19,17 @@ internal class GenerationActivityManager(IGenerationActivityRepository activityR
     public async Task<IEnumerable<GenerationActivityDto>> GetActivitiesForToday()
     {
         var entities = await _activityRepository.GetActivitiesForDate(DateTimeOffset.UtcNow);
+        return BuildResultList(entities);
+    }
+
+    public async Task<IEnumerable<GenerationActivityDto>> GetRecentActivities()
+    {
+        var entities = await _activityRepository.GetActivitiesForDateRange(DateTimeOffset.UtcNow, TimeSpan.FromDays(1));
+        return BuildResultList(entities);
+    }
+
+    private static List<GenerationActivityDto> BuildResultList(IEnumerable<Repositories.Entities.GenerationActivityEntity> entities)
+    {
         var result = new List<GenerationActivityDto>(entities.Count());
         foreach (var entity in entities)
         {
