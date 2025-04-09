@@ -10,8 +10,8 @@ public class KandinskyResponseEntity
     [JsonPropertyName("status")]
     public required string Status { get; set; }
 
-    [JsonPropertyName("images")]
-    public List<string>? Images { get; set; }
+    [JsonPropertyName("result")]
+    public KandinskyGenerationResultEntity? Result { get; set; }
 
     [JsonPropertyName("censored")]
     public bool Censored { get; set; }

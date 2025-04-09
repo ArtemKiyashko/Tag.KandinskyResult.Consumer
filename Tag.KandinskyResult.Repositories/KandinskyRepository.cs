@@ -9,5 +9,5 @@ internal class KandinskyRepository(HttpClient httpClient) : IKandinskyRepository
     private readonly HttpClient _httpClient = httpClient;
 
     public Task<KandinskyResponseEntity?> GetGenerationStatus(string uuid) =>
-        _httpClient.GetFromJsonAsync<KandinskyResponseEntity>($"key/api/v1/text2image/status/{uuid}");
+        _httpClient.GetFromJsonAsync<KandinskyResponseEntity>($"key/api/v1/pipeline/status/{uuid}");
 }

@@ -14,6 +14,6 @@ internal class KandinskyManager(IKandinskyRepository kandinskyRepository) : IKan
         if (kandinskyResponse.Censored)
             throw new InvalidOperationException("The picture has been censored");
 
-        return kandinskyResponse.Images is null ? default : kandinskyResponse.Images[0];
+        return kandinskyResponse.Result is null || kandinskyResponse.Result.Files is null ? default : kandinskyResponse.Result.Files[0];
     }
 }
