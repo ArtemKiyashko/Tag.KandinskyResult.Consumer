@@ -11,7 +11,7 @@ internal class KandinskyManager(IKandinskyRepository kandinskyRepository) : IKan
         var kandinskyResponse = await _kandinskyRepository.GetGenerationStatus(uuid);
         if (kandinskyResponse is null || !kandinskyResponse.Status.Equals("DONE", StringComparison.OrdinalIgnoreCase))
             return default;
-        if (kandinskyResponse.Censored)
+        if (kandinskyResponse.Result != null && kandinskyResponse.Result.Censored)
             throw new InvalidOperationException("The picture has been censored");
 
         return kandinskyResponse.Result is null || kandinskyResponse.Result.Files is null ? default : kandinskyResponse.Result.Files[0];

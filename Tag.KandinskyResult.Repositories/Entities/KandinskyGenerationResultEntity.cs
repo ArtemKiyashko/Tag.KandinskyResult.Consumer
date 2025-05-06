@@ -7,4 +7,7 @@ public class KandinskyGenerationResultEntity
 {
     [JsonPropertyName("files")]
     public List<string>? Files { get; set; }
+
+    [JsonPropertyName("censored")]
+    public bool Censored { get; set; }
 }

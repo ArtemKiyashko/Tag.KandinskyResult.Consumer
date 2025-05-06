@@ -13,9 +13,6 @@ public class KandinskyResponseEntity
     [JsonPropertyName("result")]
     public KandinskyGenerationResultEntity? Result { get; set; }
 
-    [JsonPropertyName("censored")]
-    public bool Censored { get; set; }
-
     [JsonPropertyName("generationTime")]
     public int? GenerationTime { get; set; }
 }
