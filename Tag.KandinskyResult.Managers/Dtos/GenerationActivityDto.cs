@@ -11,4 +11,5 @@ public class GenerationActivityDto
     public string? ResultPath { get; set; }
     public required string Prompt { get; set; }
     public required string Uuid { get; set; }
+    public int ReadRetryCount { get; set; } = 0;
 }

@@ -40,24 +40,38 @@ namespace Tag.KandinskyResult.Consumer
                     _logger.LogInformation(
                         ex, "Picture censored. Prompt: [{prompt}]. ChatId: [{chatId}]. RequestId: [{requestId}]", activity.Prompt, activity.ChatTgId, activity.Id);
                     await _telegramBotClient.SendTextMessageAsync(
-                        chatId: activity.ChatTgId, 
+                        chatId: activity.ChatTgId,
                         text: $"Это название [{activity.Prompt}] было отцензурено. Попробуйте использовать другое.");
                     await _generationActivityManager.CompleteActivity(activity);
                 }
                 catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
                 {
-                    await _generationActivityManager.CompleteActivity(activity);
+                    if (activity.ReadRetryCount >= 3)
+                    {
+                        _logger.LogInformation(
+                            ex, "Image not found after 3 retries. Activity: {activityId}. ChatId: {chatId}", activity.Id, activity.ChatTgId);
+                        await _telegramBotClient.SendTextMessageAsync(
+                            chatId: activity.ChatTgId,
+                            text: $"Изображение не удалось сгенерировать. Попробуйте повторить");
+                        await _generationActivityManager.CompleteActivity(activity);
+                    }
+                    else
+                    {
+                        _logger.LogInformation(ex, "Image not found. Retrying for activity: {activityId}. ChatId: {chatId}", activity.Id, activity.ChatTgId);
+                        await _generationActivityManager.SetReadRetryCountTo(activity, activity.ReadRetryCount++);
+                    }
                 }
                 catch (ApiRequestException ex) when (ex.ErrorCode == 400 && ex.Message == "Bad Request: not enough rights to change chat photo")
                 {
                     _logger.LogInformation(
                         ex, "Bot not granted required permissions to set chat (id: {chatId}) photo", activity.ChatTgId);
                     await _telegramBotClient.SendTextMessageAsync(
-                        chatId: activity.ChatTgId, 
+                        chatId: activity.ChatTgId,
                         text: $"Нет прав для установки аватарки чата. Дайте мне необходимые права и повторите /generate");
                     await _generationActivityManager.CompleteActivity(activity);
                 }
-                catch (Exception ex){
+                catch (Exception ex)
+                {
                     _logger.LogError(ex, "Unhandled exception appeared. Suppressing to let others activities go. Check InnerException for details");
                 }
             }

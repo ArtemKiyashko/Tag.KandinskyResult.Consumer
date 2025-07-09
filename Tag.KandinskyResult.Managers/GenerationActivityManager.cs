@@ -43,12 +43,21 @@ internal class GenerationActivityManager(IGenerationActivityRepository activityR
                 ResultPath = entity.ResultPath,
                 GenerationRequestedDateTime = entity.GenerationRequestedDateTime,
                 Prompt = entity.Prompt,
-                Uuid = entity.Uuid
+                Uuid = entity.Uuid,
+                ReadRetryCount = entity.ReadRetryCount
             };
 
             result.Add(dto);
         }
 
         return result;
+    }
+
+    public async Task<int> SetReadRetryCountTo(GenerationActivityDto activityDto, int retryCount)
+    {
+        var entity = await _activityRepository.GetActivityForDate(activityDto.GenerationRequestedDateTime, activityDto.Id.ToString());
+        entity.ReadRetryCount++;
+        await _activityRepository.UpdateActivity(entity);
+        return entity.ReadRetryCount;
     }
 }
