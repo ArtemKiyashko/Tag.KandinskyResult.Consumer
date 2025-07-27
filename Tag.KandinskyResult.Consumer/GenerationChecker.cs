@@ -44,6 +44,15 @@ namespace Tag.KandinskyResult.Consumer
                         text: $"Это название [{activity.Prompt}] было отцензурено. Попробуйте использовать другое.");
                     await _generationActivityManager.CompleteActivity(activity);
                 }
+                catch (InvalidOperationException ex) when (ex.Message == "The limit has been reached")
+                {
+                    _logger.LogInformation(
+                        ex, "Limit reached for activity: {activityId}. ChatId: {chatId}", activity.Id, activity.ChatTgId);
+                    await _telegramBotClient.SendTextMessageAsync(
+                        chatId: activity.ChatTgId,
+                        text: $"Достигнут лимит генерации изображений. Попробуйте позже.");
+                    await _generationActivityManager.CompleteActivity(activity);
+                }
                 catch (HttpRequestException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
                 {
                     if (activity.ReadRetryCount >= 3)

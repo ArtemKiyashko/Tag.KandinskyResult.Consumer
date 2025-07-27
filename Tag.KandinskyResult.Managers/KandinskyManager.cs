@@ -9,8 +9,13 @@ internal class KandinskyManager(IKandinskyRepository kandinskyRepository) : IKan
     public async Task<string?> GetImageBase64(string uuid)
     {
         var kandinskyResponse = await _kandinskyRepository.GetGenerationStatus(uuid);
-        if (kandinskyResponse is null || !kandinskyResponse.Status.Equals("DONE", StringComparison.OrdinalIgnoreCase))
+
+        if (kandinskyResponse is not null && kandinskyResponse.Status.Equals("FAIL", StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException(kandinskyResponse.StatusDescription);
+
+        if (kandinskyResponse is null)
             return default;
+            
         if (kandinskyResponse.Result != null && kandinskyResponse.Result.Censored)
             throw new InvalidOperationException("The picture has been censored");
 
